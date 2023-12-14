@@ -18,15 +18,14 @@ SCOPLOT
 ; PLOT THE SCORE.
 ; INPUT    : NONE 
 ; OUTPUT   : NONE
-; MODIFIES : NONE
+; MODIFIES : D0-D1/A1
 ; ------------------------------------------------------------------------------
     
             MOVEM.L D0-D1/A1,-(A7)
             
-            ;ESTABLECER COLOR RELLENO
-			SET_FILL_COLOR	#SCOFLCLR
+	     SET_FILL_COLOR #SCOFLCLR
             
-            ;ESTABLECER POSICIÓN
+            ;ESTABLECER POSICIÃ“N
             MOVE.B  #11,D0
             MOVE.W  #SCOLINE,D1
             TRAP    #15
