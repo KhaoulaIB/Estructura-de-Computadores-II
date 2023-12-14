@@ -38,13 +38,13 @@ TNKUPD
             SUB.W   #TNKSPEED,D0
               
             ;COMPOBAR COLISIONES PANTALLA
-            ;COMPROBAR COLISIÓN IZQUIERDA
+            ;COMPROBAR COLISIÃ“N IZQUIERDA
 .CHKLEFT    CMP.W   #0,D0
             BGE     .CHKRIGHT
             CLR.W   D0
             BRA     .DONE
 
-            ;COMPROBAR COLISIÓN DERECHA
+            ;COMPROBAR COLISIÃ“N DERECHA
 .CHKRIGHT   CMP.W   #SCRWIDTH-TNKWIDTH,D0     ;RESTA ANCHO DEL TANQUE
             BLE     .DONE
             MOVE.W  #SCRWIDTH-TNKWIDTH,D0          
@@ -65,21 +65,19 @@ TNKPLOT
     
             MOVEM.L D0-D6/A0,-(A7)
             
-            ;ESTABLECER COLOR CONTORNO
-			SET_PEN_COLOR #TNKPNCLR
+	SET_PEN_COLOR #TNKPNCLR
 
-            ;ESTABLECER COLOR RELLENO
-            SET_FILL_COLOR	#TNKFLCLR
+        SET_FILL_COLOR	#TNKFLCLR
             ;DIBUJAR TANQUE
             LEA     TNKMAP,A1
             MOVE.B  #87,D0
             MOVE.W  #TNKPOSY,D2
-            MOVE.W  #TNKPOSY+TNKSQUWI,D4                ;DEFINIR POSICIÓN Y
+            MOVE.W  #TNKPOSY+TNKSQUWI,D4                ;DEFINIR POSICIÃ“N Y
             MOVE.W  #TNKROW-1,D6                        ;FILAS
 
 .CLOOP      MOVE.W  (TNKPOSX),D1
             MOVE.W  D1,D3
-            ADD.W   #TNKSQUWI,D3                        ;DEFINIR POSICIÓN X
+            ADD.W   #TNKSQUWI,D3                        ;DEFINIR POSICIÃ“N X
             MOVE.W  #TNKCOL-1,D5                        ;COLUMNAS
 .RLOOP      TST.B   (A1)+
             BEQ     .NEXT
