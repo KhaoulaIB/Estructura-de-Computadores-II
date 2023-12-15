@@ -52,7 +52,7 @@ ALNUPD
 .DONE       MOVE.W  D0,(ALNPOSX)
             MOVE.W  D1,(ALNPOSY)
 
-            MOVEM.L (A7)+,D0-D1/A3	; eliminar hasta e d7
+            MOVEM.L (A7)+,D0-D1/A3	; 
             RTS
 
 
@@ -66,8 +66,7 @@ ALNPLOT
 ; MODIFIES : NONE
 ;--------------------------------------------------------------------------------
     
-            MOVEM.L D1-D6/A2,-(A7)	; no modifica el d0 así lo quité 
-            
+            MOVEM.L D1-D6/A2,-(A7)	            
             ;DEFINE COLORES
             SET_PEN_COLOR	#ALNPNCLR
             SET_FILL_COLOR	#ALNFLCLR
@@ -151,9 +150,19 @@ ALNDATA     DC.B    0,0,0,0,0,0,0,0,0,0
             DS.W    0
 
 
-
-
-
+; ------------------------------------------------------------------------------
+MAPPLOT
+; RELLENA EL MAPDATA 
+; INPUT    : NONE
+; OUTPUT   : NONE
+; MODIFIES : NONE
+; ------------------------------------------------------------------------------
+		MOVEM.W	D0/A1,-(A7)
+		LEA		MAPDATA,A1
+		MOVE.W	#ALNMPROW*ALNMPCOL-1,D0
+LOOPMAP	OR.B   #1,(A1,D0.W)        ;DESAPARECE EL ALIEN     	
+		DBRA	D0,LOOPMAP
+		MOVEM.W	(A7)+,D0/A1
 
 
 
@@ -161,6 +170,7 @@ ALNDATA     DC.B    0,0,0,0,0,0,0,0,0,0
 
 
      
+
 
 
 
