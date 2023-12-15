@@ -1,8 +1,8 @@
 *-----------------------------------------------------------
-* Title      : PR¡CTICA 1
-* Written by :
-* Date       :
-* Description:
+* Title      : PR√ÅCTICA 1
+* Written by :KhAOULA IKKENE & ADRIAN RUIZ VIDA√ë
+* Date       :STARTED IT THE FIRST WEEK 
+* Description: SPACE INVADERS GAME
 *-----------------------------------------------------------
    
             ORG     $1000
@@ -12,20 +12,17 @@
             INCLUDE "LIB/DMMCONST.X68"
             INCLUDE "LIB/DMMCODE.X68"
             INCLUDE "SYSTEM.X68"
-            INCLUDE "MACROS.X68"		;EL ORDEN IMPORTA
+            INCLUDE "MACROS.X68"		    ;EL ORDEN IMPORTA
             INCLUDE "LIB/AGLCODE.X68"
             INCLUDE "LIB/UTLCODE.X68"
             INCLUDE "TANK.X68"
             INCLUDE "ALIEN.X68"
             INCLUDE "SHOT.X68"
             INCLUDE "SCORE.X68"
-            INCLUDE "FPS.X68"
-           
+            INCLUDE "FPS.X68"          
             
 START
-
-
-			 ORI.W   #$0700,SR
+            ORI.W   #$0700,SR
             
             ;INITS
             JSR     SYSINIT
@@ -35,12 +32,13 @@ START
             JSR     DMMINIT 
             JSR     SCOINIT
             JSR     FPSINIT
+            JSR 	MAPPLOT
               
 .LOOP
             TRAP    #1
             
             
-			;A—ADIR DISPARO SI TECLADO = "UP" 
+			;A√ëADIR DISPARO SI TECLADO = "UP" 
 			BTST.B	#2,(KBDEDGE)
 			BEQ		.GOUPD
 			LEA     SHTINIT,A1
@@ -77,7 +75,6 @@ START
             INCLUDE "LIB/UTLVARS.X68"
             INCLUDE "SYSVARS.X68"
             INCLUDE "LIB/DMMVARS.X68"
-
  
             END    START      
 
@@ -139,7 +136,6 @@ START
 
 
 
-*~Font name~Courier New~
-*~Font size~14~
-*~Tab type~1~
-*~Tab size~4~
+
+
+
