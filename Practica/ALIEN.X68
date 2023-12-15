@@ -23,12 +23,12 @@ ALNUPD
 ; MODIFIES : NONE
 ; ------------------------------------------------------------------------------
             ;MOVIMIENTO ALIENS
-            MOVEM.L D0-D7/A3,-(A7)
+            MOVEM.L D0-D1/A3,-(A7)
             
             ; UPDATE BALL COORDINATES
             MOVE.W  (ALNPOSX),D0
             MOVE.W  (ALNPOSY),D1
-            SUB.W   (ALNVELX),D0
+           	SUB.W   (ALNVELX),D0
             
             ; CHECK HORIZONTAL COLLISIONS
             CMP.W   #SCRWIDTH-440,D0
@@ -48,17 +48,11 @@ ALNUPD
             NEG.W   (ALNVELX)
             MOVE.W  #40,D0
             
-*			MULU.W	#ALNMPCOL,D6	    ;NUMERO DE ALIENS POR COLUMNA
-*			ADD.W   D6,D4	            ;D4 CONTIENE EL INDICE DEL ALIEN
-*			AND.L	#$0000FFFF,D4
-*			;LEA	    MAPDATA, A3
-*			;AND.B	#0,(A3,D4.W)
-            
             ; STORE POSITION
 .DONE       MOVE.W  D0,(ALNPOSX)
             MOVE.W  D1,(ALNPOSY)
 
-            MOVEM.L (A7)+,D0-D7/A3
+            MOVEM.L (A7)+,D0-D1/A3	; eliminar hasta e d7
             RTS
 
 
@@ -72,7 +66,7 @@ ALNPLOT
 ; MODIFIES : NONE
 ;--------------------------------------------------------------------------------
     
-            MOVEM.L D0-D6/A2,-(A7)
+            MOVEM.L D1-D6/A2,-(A7)	; no modifica el d0 asÃ­ lo quitÃ© 
             
             ;DEFINE COLORES
             SET_PEN_COLOR	#ALNPNCLR
@@ -83,12 +77,12 @@ ALNPLOT
             ;CALCULAR COORDENADAS
             MOVE.W  (ALNPOSY),D2
             MOVE.W  D2,D4
-            ADD.W   #ALNDIM,D4          ;POSICIÓN Y
+            ADD.W   #ALNDIM,D4          ;POSICIÃ“N Y
             MOVE.W  #ALNMPROW-1,D6      ;FILAS MAPA
 
 .CLOOP      MOVE.W  (ALNPOSX),D1
             MOVE.W  D1,D3
-            ADD.W   #ALNDIM,D3          ;POSICIÓN X
+            ADD.W   #ALNDIM,D3          ;POSICIÃ“N X
             MOVE.W  #ALNMPCOL-1,D5      ;COLUMNAS MAPA
 .RLOOP      TST.B   (A2)+
             BEQ     .NEXT
@@ -100,7 +94,7 @@ ALNPLOT
             ADD.W   #ALNDIM,D4
             DBRA.W  D6,.CLOOP
 
-            MOVEM.L (A7)+,D0-D6/A2
+            MOVEM.L (A7)+,D1-D6/A2
             RTS   
  
 MAPDATA     DC.B    1,1,1,1,1,1,1,1,1,1
@@ -124,12 +118,12 @@ ALNPLOT1
             MOVE.B  #87,D0
              
             MOVE.W  D2,D4
-            ADD.W   #4,D4           ;POSICIÓN Y
+            ADD.W   #4,D4           ;POSICIÃ“N Y
             MOVE.W  #ALNROW-1,D6    ;FILAS ALIEN             
 
 .CLOOP1     MOVE.W  D7,D1           ;RESTAURA REGISTRO
             MOVE.W  D1,D3
-            ADD.W   #4,D3           ;POSICIÓN X    
+            ADD.W   #4,D3           ;POSICIÃ“N X    
             MOVE.W  #ALNCOL-1,D5    ;COLUMNAS ALIEN                   
 .RLOOP1     TST.B   (A1)+
             BEQ     .NEXT1
@@ -206,7 +200,5 @@ ALNDATA     DC.B    0,0,0,0,0,0,0,0,0,0
 
 
 
-*~Font name~Courier New~
-*~Font size~14~
-*~Tab type~1~
-*~Tab size~4~
+
+
