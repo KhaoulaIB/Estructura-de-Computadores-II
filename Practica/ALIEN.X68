@@ -12,6 +12,7 @@ ALNINIT
             MOVE.W  #ALNIPOSY,(ALNPOSY) 
             MOVE.W  #ALNSPEED,(ALNVELX)
             MOVE.W  #ALNSPEED,(ALNVELY) 
+           	JSR MAPPLOT
                     
             RTS
 
@@ -157,49 +158,23 @@ MAPPLOT
 ; OUTPUT   : NONE
 ; MODIFIES : NONE
 ; ------------------------------------------------------------------------------
-		MOVEM.W	D0/A1,-(A7)
-		LEA		MAPDATA,A1
-		MOVE.W	#ALNMPROW*ALNMPCOL-1,D0
-LOOPMAP	OR.B   #1,(A1,D0.W)        ;DESAPARECE EL ALIEN     	
-		DBRA	D0,LOOPMAP
-		MOVEM.W	(A7)+,D0/A1
+	MOVEM.W	D1-D2/A1,-(A7)
+	LEA     MAPDATA, A1         
+    MOVEQ   #1, D1              
+    MOVEQ   #30-1, D2             
 
+RESET_LOOP
+    MOVE.B  D1, (A1)+           ; Establecer el valor en la ubicación actual de MAPDATA y avanzar
+    DBRA    D2, RESET_LOOP      ; Decrementar D2 y saltar de nuevo si no se ha alcanzado la longitud total
+
+    MOVEM.W	(A7)+,D1-D2/A1
+	RTS  
 
 
 
 
 
      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
