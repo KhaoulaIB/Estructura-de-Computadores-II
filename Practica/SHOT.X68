@@ -81,7 +81,7 @@ SHTUPD
             MOVE.W  D1,D3               ;COPIAR ALNPOSY
             ADD.W   #ALNDIM*ALNMPROW,D3 ;ALNPOSY + ALNDIM * ALNMPROW
             CMP.W   D3,D2
-            BGT     .DONE
+            BGE     .DONE
              
            	;HAY COLISIÓN, COMPROBAMOS QUÉ ALIEN ES
            	;DETERMINAMOS LA COLUMNA
