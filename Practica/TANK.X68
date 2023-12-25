@@ -41,13 +41,14 @@ TNKUPD
             ;COMPROBAR COLISIÓN IZQUIERDA
 .CHKLEFT    CMP.W   #0,D0
             BGE     .CHKRIGHT
-            CLR.W   D0
+            CLR.W   D0                          ;LO COLOCA A LA IZQUIERDA DE LA PANTALLA
             BRA     .DONE
 
             ;COMPROBAR COLISIÓN DERECHA
-.CHKRIGHT   CMP.W   #SCRWIDTH-TNKWIDTH,D0     ;RESTA ANCHO DEL TANQUE
+.CHKRIGHT   CMP.W   #SCRWIDTH-TNKWIDTH,D0     
             BLE     .DONE
-            MOVE.W  #SCRWIDTH-TNKWIDTH,D0          
+            ;RESTA ANCHO DEL TANQUE
+            MOVE.W  #SCRWIDTH-TNKWIDTH,D0       ;LO COLOCA A LA DERECHA DE LA PANTALLA     
             
             ;ACTUALIZAR VARIABLE
 .DONE       MOVE.W  D0,(TNKPOSX)
@@ -65,9 +66,12 @@ TNKPLOT
     
             MOVEM.L D0-D6/A0,-(A7)
             
-	SET_PEN_COLOR #TNKPNCLR
+            ;ESTABLECER COLOR CONTORNO
+			SET_PEN_COLOR #TNKPNCLR
 
-        SET_FILL_COLOR	#TNKFLCLR
+            ;ESTABLECER COLOR RELLENO
+            SET_FILL_COLOR	#TNKFLCLR
+            
             ;DIBUJAR TANQUE
             LEA     TNKMAP,A1
             MOVE.B  #87,D0
@@ -119,7 +123,8 @@ TNKMAP      DC.B    0,0,0,0,1,0,0,0,0
 
 
 
-*~Font name~Courier New~
-*~Font size~14~
-*~Tab type~1~
-*~Tab size~4~
+
+
+
+
+
