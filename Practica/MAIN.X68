@@ -1,7 +1,7 @@
 *-----------------------------------------------------------
 * Title      : PRÁCTICA 1
-* Written by :KhAOULA IKKENE & ADRIAN RUIZ VIDAÑ
-* Date       :STARTED IT THE FIRST WEEK 
+* Written by : KHAOULA IKKENE & ADRIÁN RUIZ VIDAL
+* Date       : STARTED IT THE FIRST WEEK 
 * Description: SPACE INVADERS GAME
 *-----------------------------------------------------------
    
@@ -10,6 +10,7 @@
             INCLUDE "SYSCONST.X68"
             INCLUDE "CONST.X68"
             INCLUDE "LIB/DMMCONST.X68"
+            INCLUDE "LIB/UTLCONST.X68"
             INCLUDE "LIB/DMMCODE.X68"
             INCLUDE "SYSTEM.X68"
             INCLUDE "MACROS.X68"		    ;EL ORDEN IMPORTA
@@ -19,7 +20,13 @@
             INCLUDE "ALIEN.X68"
             INCLUDE "SHOT.X68"
             INCLUDE "SCORE.X68"
-            INCLUDE "FPS.X68"          
+            INCLUDE "FILE.X68"
+            INCLUDE "STATES.X68"
+            INCLUDE "INTRO.X68" 
+            INCLUDE "DEMO.X68"  
+            INCLUDE "GAME.X68"
+            INCLUDE "WIN.X68"
+            INCLUDE "GOVER.X68"            
             
 START
             ORI.W   #$0700,SR
@@ -27,42 +34,21 @@ START
             ;INITS
             JSR     SYSINIT
             JSR     UTLINIT
-            JSR     TNKINIT
-            JSR     ALNINIT
-            JSR     DMMINIT 
-            JSR     SCOINIT
-            JSR     FPSINIT
-            JSR 	MAPPLOT
+            JSR     STAINIT
               
 .LOOP
             TRAP    #1
             
-            
-			;AÑADIR DISPARO SI TECLADO = "UP" 
-			BTST.B	#2,(KBDEDGE)
-			BEQ		.GOUPD
-			LEA     SHTINIT,A1
-            LEA     SHTUPD,A2
-            LEA     SHTPLOT,A3
-            MOVE.W  #1,D0
-           	JSR     AGLADD
-
-.GOUPD      ;UPDATES
-            JSR     AGLUPD
-            JSR     TNKUPD
-            JSR     ALNUPD
+            ;UPDATE CURRENT STATE         
+            JSR     STAUPD
             
             ;SYNC
 .WINT       TST.B   (SCRINTCT)
             BEQ     .WINT
             CLR.B   (SCRINTCT)
             
-            ;PLOTS
-            JSR 	AGLPLOT
-            JSR     TNKPLOT
-            JSR     ALNPLOT
-       		JSR     SCOPLOT
-            JSR     FPSPLOT
+            ;PLOT CURRENT STATE
+            JSR 	STAPLOT
              
             ;UPDATE DOUBLE BUFFER
             TRAP    #0  
@@ -77,6 +63,26 @@ START
             INCLUDE "LIB/DMMVARS.X68"
  
             END    START      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
