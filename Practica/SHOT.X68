@@ -110,12 +110,15 @@ SHTUPD
 			;DETERMINAMOS LA POSICIÓN EN LA MATRIZ
 			MULU.W	#10,D2              ;D2 = ÍNDICE FILA * 10
 			ADD.W   D2,D0               ;D0 = D2 + ÍNDICE COLUMNA                
-			LEA	    MAPDATA, A3
-			CMP.B	#1,(A3,D0.W)        ;MIRAMOS SI ESTÁ VIVO EL ALIEN	   
+			
+			;MIRAMOS SI ESTÁ VIVO EL ALIEN
+			LEA	    MAPDATA,A3
+			CMP.B	#1,(A3,D0.W)          
 			BNE     .DONE
 			
-			;SI ESTÁ VIVO EL ALIEN
-			AND.B   #0,(A3,D0.W)        ;DESAPARECE EL ALIEN         
+			;ALIEN VIVO
+			;AND.W	#$00FF,D0 	        ;LIMPIAR EL BYTE MAS SIGNIFICATIVO DE D0
+			AND.B   #0,(A3,D0.W)        ;DESAPARECE EL ALIEN
 			ADDQ.W	#1,(SCOPOINT)	    ;INCREMENTAMOS LOS PUNTOS ACUMULADOS           
             JSR     AGLKILL             ;ELIMINA DISPARO
                  
@@ -131,7 +134,7 @@ SHTPLOT
 ; MODIFIES : NONE
 ; ------------------------------------------------------------------------------
     
-            MOVEM.L D1-D4,-(A7)
+            MOVEM.L D0-D4,-(A7)
             
             ;ESTABLECER COLOR CONTORNO
             SET_PEN_COLOR	#SHTPNCLR            
@@ -150,8 +153,17 @@ SHTPLOT
             MOVE.B  #87,D0
             TRAP    #15
             
-            MOVEM.L (A7)+,D1-D4
+            MOVEM.L (A7)+,D0-D4
             RTS        
+
+
+
+
+
+
+
+
+
 
 
 
