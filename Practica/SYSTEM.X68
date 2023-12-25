@@ -12,7 +12,7 @@ SYSINIT
             JSR SCRINIT
             JSR KBDINIT
 
-            ;INSTALAR TRAPS I INTERRUPCIONS
+            ;INSTALAR TRAPS Y INTERRUPCIONES
             MOVE.L  #SCRPLOT,($80)
             MOVE.L  #KBDUPD,($84)
             MOVE.L  #SCRTIM,($64)
@@ -94,6 +94,7 @@ SCRTIM
 ; MODIFIES : NONE
 ; ------------------------------------------------------------------------------
             ADDQ.B  #1,(SCRINTCT)
+            ADDQ.B  #1,(SCRCYCCT)
             RTE
 
  
@@ -113,10 +114,14 @@ KBDINIT
  ; ------------------------------------------------------------------------------
 KBDUPD
 ; UPDATE THE KEYBOARD IN THIS ORDER:
-;KBDLEFT   : BIT 3   
-;KBDUP     : BIT 2   
-;KBDRIGHT  : BIT 1
-;KBDDOWN   : BIT 0
+; KBDPAUSE  : BIT 7   
+; KBDFIRE3    : BIT 6   
+; KBDFIRE2 : BIT 5
+; KBDFIRE1  : BIT 4
+; KBDLEFT  : BIT 3   
+; KBDUP    : BIT 2   
+; KBDRIGHT : BIT 1
+; KBDDOWN  : BIT 0
 ; INPUT    : NONE
 ; OUTPUT   : NONE
 ; MODIFIES : NONE
@@ -124,14 +129,21 @@ KBDUPD
             
             MOVEM.L D0-D3,-(A7)
             
+            ;BITS 4-7
+            ; READ FIRST PART
             MOVE.B  #19,D0
-            MOVE.L  #KBDLEFT<<24|KBDUP<<16|KBDRIGHT<<8|KBDDOWN,D1
+            MOVE.L  #KBDPAUSE<<24|KBDFIRE3<<16|KBDFIRE2<<8|KBDFIRE1,D1
             TRAP    #15
             
-            MOVE.W  #4-1,D3
-.LOOP       LSL.L   #8,D1
-            ROXL.B  #1,D2
-            DBRA.W   D3,.LOOP
+            JSR     .PACK
+            
+            ;BITS 0-3
+            ; READ SECOND PART
+            MOVE.L  #KBDLEFT<<24|KBDUP<<16|KBDRIGHT<<8|KBDDOWN,D1
+            TRAP    #15
+
+            ; CONVERT TO DESIRED FORMAT
+            JSR     .PACK
             
             ;COMPUTE KBDEDGE
             MOVE.B  (KBDVAL),D0
@@ -143,6 +155,12 @@ KBDUPD
             
             MOVEM.L (A7)+,D0-D3
             RTE
+            
+.PACK       MOVE.W  #3,D3
+.LOOP       LSL.L   #8,D1
+            ROXL.B  #1,D2
+            DBRA.W  D3,.LOOP
+            RTS
 
 ; ------------------------------------------------------------------------------
 SYSUPD
@@ -170,7 +188,7 @@ SYSPLOT
 
 
 
-*~Font name~Courier New~
-*~Font size~14~
-*~Tab type~1~
-*~Tab size~4~
+
+
+
+
