@@ -9,10 +9,13 @@ ALNINIT
 ; MODIFIES : NONE
 ; ------------------------------------------------------------------------------
             MOVE.W  #ALNIPOSX,(ALNPOSX)
-            MOVE.W  #ALNIPOSY,(ALNPOSY) 
+            MOVE.W  #ALNIPOSY,(ALNPOSY)
             MOVE.W  #ALNSPEED,(ALNVELX)
-            MOVE.W  #ALNSPEED,(ALNVELY) 
-           	JSR MAPPLOT
+            MOVE.W  #ALNSPEED,(ALNVELY)
+*            MOVE.W  #ALNVEL1,(ALNVELV1)
+*            MOVE.W  #ALNVEL2,(ALNVELV2) 
+*            MOVE.W  #ALNVEL3,(ALNVELV3)
+           	JSR     MAPPLOT
                     
             RTS
 
@@ -23,16 +26,40 @@ ALNUPD
 ; OUTPUT   : NONE
 ; MODIFIES : NONE
 ; ------------------------------------------------------------------------------
-            ;MOVIMIENTO ALIENS
-            MOVEM.L D0-D1/A3,-(A7)
+            ; MOVIMIENTO ALIENS
+            MOVEM.L D0-D1,-(A7)
             
-            ; UPDATE BALL COORDINATES
+            ;GUARDA COORDENADAS
             MOVE.W  (ALNPOSX),D0
             MOVE.W  (ALNPOSY),D1
-           	SUB.W   (ALNVELX),D0
             
+            ;MIRAR EN QUÉ RANGO ESTÁ POS(Y)
+            ;PARA DETERMINAR EL NIVEL DE DIFICULTAD
+            CMP.W   #144,D1
+            BLT     .LVL1
+            CMP.W   #208,D1
+            BLT     .LVL2
+            BRA     .LVL3   
+            
+            ;NIVEL 1
+.LVL1      	MOVE.W  #1,(SCOLEVEL)
+            ADD.W   (ALNVELX),D0
+            BRA     .CHKCOL
+           	
+           	;NIVEL 2
+.LVL2      	MOVE.W  #2,(SCOLEVEL)
+            ADD.W   (ALNVELX),D0
+            ADD.W   (ALNVELX),D0
+            BRA     .CHKCOL
+
+            ;NIVEL 3
+.LVL3      	MOVE.W  #3,(SCOLEVEL)
+            ADD.W   (ALNVELX),D0
+            ADD.W   (ALNVELX),D0
+            ADD.W   (ALNVELX),D0
+                
             ; CHECK HORIZONTAL COLLISIONS
-            CMP.W   #SCRWIDTH-440,D0
+.CHKCOL     CMP.W   #SCRWIDTH-440,D0
             BGT     .COLRGT
             CMP.W   #40,D0
             BLT     .COLLFT
@@ -49,11 +76,11 @@ ALNUPD
             NEG.W   (ALNVELX)
             MOVE.W  #40,D0
             
-            ; STORE POSITION
+            ;ESTABLECE COORDENADAS
 .DONE       MOVE.W  D0,(ALNPOSX)
             MOVE.W  D1,(ALNPOSY)
 
-            MOVEM.L (A7)+,D0-D1/A3	; 
+            MOVEM.L (A7)+,D0-D1	 
             RTS
 
 
@@ -67,7 +94,8 @@ ALNPLOT
 ; MODIFIES : NONE
 ;--------------------------------------------------------------------------------
     
-            MOVEM.L D1-D6/A2,-(A7)	            
+            MOVEM.L D1-D6/A2,-(A7)
+	            
             ;DEFINE COLORES
             SET_PEN_COLOR	#ALNPNCLR
             SET_FILL_COLOR	#ALNFLCLR
@@ -158,23 +186,63 @@ MAPPLOT
 ; OUTPUT   : NONE
 ; MODIFIES : NONE
 ; ------------------------------------------------------------------------------
-	MOVEM.W	D1-D2/A1,-(A7)
-	LEA     MAPDATA, A1         
-    MOVEQ   #1, D1              
-    MOVEQ   #30-1, D2             
+	        MOVEM.W	D1-D2/A1,-(A7)
+	        
+	        LEA     MAPDATA,A1         
+            MOVEQ   #1,D1              
+            MOVEQ   #30-1,D2             
 
 RESET_LOOP
-    MOVE.B  D1, (A1)+           ; Establecer el valor en la ubicación actual de MAPDATA y avanzar
-    DBRA    D2, RESET_LOOP      ; Decrementar D2 y saltar de nuevo si no se ha alcanzado la longitud total
+            MOVE.B  D1,(A1)+           ;ESTABLECER EL VALOR EN LA UBICACIÓN ACTUAL Y AVANZAR
+            DBRA    D2,RESET_LOOP      ;DECREMENTAR D2 Y SALTAR SI NO HA ALCANZADO LA LONGITUD TOTAL
 
-    MOVEM.W	(A7)+,D1-D2/A1
-	RTS  
+            MOVEM.W	(A7)+,D1-D2/A1
+	        RTS  
 
 
 
 
 
      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
