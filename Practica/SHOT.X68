@@ -5,21 +5,19 @@
 *-----------------------------------------------------------
 ; ------------------------------------------------------------------------------
 SHTINIT
-; INITIALIZE THE SHOOT 
+; INITIALIZE THE SHOOT COORDINATES
 ; INPUT    :  A0 POINTER TO THE INSTANCE VARIABLES
 ; OUTPUT   : NONE
 ; MODIFIES : NONE
 ; ------------------------------------------------------------------------------
     
-            ;POSICIONAR DISPARO
             ;POSICIONAR X RESPECTO AL TANQUE
             MOVE.W  (TNKPOSX),(A0)
             ADD.W   #TNKWIDHA,(A0)
             
             ;POSICIONAR Y RESPECTO AL TANQUE
             MOVE.W  #TNKPOSY,2(A0)
-            SUB.W   #SHTGAP+SHTHEIGH/2,2(A0)
-
+            SUB.W   #SHTGAP+SHTHEIGH/2,2(A0)  
             RTS
  
 ; ------------------------------------------------------------------------------
@@ -42,12 +40,13 @@ SHTUPD
            	ADD.W   #SHTHEIGH,D1
            	LSR.W   #1,D1
            	ADD.W   D1,D0
-           	CMP.W   #0,D0
+           	CMP.W   #LIMIT,D0
            	BGT     .NEXT
            	JSR     AGLKILL
            	
            	;COMPOBAR COLISIONES CON DISPARO (DESAPARECER)
-            ;COMPROBAR COLISI√ìN DISPARO X IZQUIERDA  
+           	
+            ;COMPROBAR COLISI”N DISPARO X IZQUIERDA  
 .NEXT       MOVE.W  (ALNPOSX),D0        ;D0 = ALNPOSX 
             MOVE.W  #SHTWIDTH,D2
             LSR.W   #1,D2
@@ -55,7 +54,7 @@ SHTUPD
             CMP.W   D0,D2             
             BLT     .DONE
             
-            ;COMPROBAR COLISI√ìN DISPARO X DERECHA
+            ;COMPROBAR COLISI”N DISPARO X DERECHA
             MOVE.W  #SHTWIDTH,D2
             LSR.W   #1,D2
             SUB.W   (A0),D2            
@@ -65,7 +64,7 @@ SHTUPD
             CMP.W   D3,D2
             BGT     .DONE
             
-            ;COMPROBAR COLISI√ìN DISPARO Y ARRIBA
+            ;COMPROBAR COLISI”N DISPARO Y ARRIBA
             MOVE.W  (ALNPOSY),D1        ;D1 = ALNPOSY
             MOVE.W  #SHTHEIGH,D2
             LSR.W   #1,D2
@@ -73,7 +72,7 @@ SHTUPD
             CMP.W   D1,D2              
             BLT     .DONE
             
-            ;COMPROBAR COLISI√ìN DISPARO Y ABAJO
+            ;COMPROBAR COLISI”N DISPARO Y ABAJO
             MOVE.W  #SHTHEIGH,D2
             LSR.W   #1,D2
             SUB.W   2(A0),D2         
@@ -82,8 +81,9 @@ SHTUPD
             ADD.W   #ALNDIM*ALNMPROW,D3 ;ALNPOSY + ALNDIM * ALNMPROW
             CMP.W   D3,D2
             BGE     .DONE
-             
-           	;HAY COLISI√ìN, COMPROBAMOS QU√â ALIEN ES
+            
+			
+           	;HAY COLISI”N, COMPROBAMOS QU… ALIEN ES
            	;DETERMINAMOS LA COLUMNA
            	MOVE.W  #SHTWIDTH,D0
            	LSR.W   #1,D0
@@ -107,11 +107,11 @@ SHTUPD
 			MOVE.W  D1,D2
 			CLR.L   D1                  ;EL RESTO DE DIVU NO NOS INTERESA
 			
-			;DETERMINAMOS LA POSICI√ìN EN LA MATRIZ
-			MULU.W	#10,D2              ;D2 = √çNDICE FILA * 10
-			ADD.W   D2,D0               ;D0 = D2 + √çNDICE COLUMNA                
+			;DETERMINAMOS LA POSICI”N EN LA MATRIZ
+			MULU.W	#10,D2              ;D2 = ÕNDICE FILA * 10
+			ADD.W   D2,D0               ;D0 = D2 + ÕNDICE COLUMNA                
 			
-			;MIRAMOS SI EST√Å VIVO EL ALIEN
+			;MIRAMOS SI EST¡ VIVO EL ALIEN
 			LEA	    MAPDATA,A3
 			CMP.B	#1,(A3,D0.W)          
 			BNE     .DONE
@@ -121,7 +121,9 @@ SHTUPD
 			AND.B   #0,(A3,D0.W)        ;DESAPARECE EL ALIEN
 			ADDQ.W	#1,(SCOPOINT)	    ;INCREMENTAMOS LOS PUNTOS ACUMULADOS           
             JSR     AGLKILL             ;ELIMINA DISPARO
-                 
+            ;REPRODUCIR SONIDO	DE COLISI”N
+			MOVE.B	#SNDSHT,D7
+			TRAP	#SNDPLTN     
 .DONE       MOVEM.W  (A7)+,D2-D4
             MOVEM.L  (A7)+,D0-D1
             RTS
@@ -212,3 +214,9 @@ SHTPLOT
 
 
 
+
+
+*~Font name~Courier New~
+*~Font size~14~
+*~Tab type~1~
+*~Tab size~4~

@@ -1,6 +1,6 @@
 *-----------------------------------------------------------
-* Title      : PR√ÅCTICA 1
-* Written by : KHAOULA IKKENE & ADRI√ÅN RUIZ VIDAL
+* Title      : PR¡CTICA 1
+* Written by : KHAOULA IKKENE & ADRI¡N RUIZ VIDAL
 * Date       : STARTED IT THE FIRST WEEK 
 * Description: SPACE INVADERS GAME
 *-----------------------------------------------------------
@@ -145,3 +145,12 @@ START
 
 
 
+
+
+
+
+
+*~Font name~Courier New~
+*~Font size~14~
+*~Tab type~1~
+*~Tab size~4~

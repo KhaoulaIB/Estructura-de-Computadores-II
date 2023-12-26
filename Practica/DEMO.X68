@@ -12,7 +12,9 @@ DEMINIT
             JSR     DMMINIT
             JSR     FILINIT
             JSR     TNKINIT
-            JSR     ALNINIT 
+            JSR     ALNINIT
+*			MOVE.B	#SNDDEM,D7
+*            TRAP	#SNDPLTN      
             BRA     SCOINIT
 
 ; ------------------------------------------------------------------------------
@@ -50,7 +52,7 @@ DEMPLOT
             JSR     ALNPLOT
        		JSR     SCOPLOT
 
-            ;MOSTRAR LAS L√çNEAS PARA PASAR AL SIGUIENTE ESTADO
+            ;MOSTRAR LAS LÕNEAS PARA PASAR AL SIGUIENTE ESTADO
             SET_FILL_COLOR	#STAFLCLR
             
             LEA     .TXT1,A0
@@ -79,3 +81,9 @@ DEMPLOT
 
 
 
+
+
+*~Font name~Courier New~
+*~Font size~14~
+*~Tab type~1~
+*~Tab size~4~

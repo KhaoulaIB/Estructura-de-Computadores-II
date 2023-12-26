@@ -45,12 +45,12 @@ FILUPD
             BEQ     .DONE
             ADDQ.L  #1,A1
             
-            ;ESPERAR 10 ms ENTRE UNA ACCIÃ“N Y LA SIGUIENTE
+            ;ESPERAR 10 ms ENTRE UNA ACCIÓN Y LA SIGUIENTE
             MOVE.B  #23,D0
             MOVE.L  #1,D1
             TRAP    #15
             
-            ;MIRAR QUÃ‰ BIT ES
+            ;MIRAR QUÉ BIT ES
             CMP.B   #1,D3
             BNE     .NEXT1
             JSR     TNKRIGHT    ;MOVER TANQUE DERECHA SI BIT = 1
@@ -105,7 +105,7 @@ TNKRIGHT
             ;MOVER TANQUE A LA DERECHA
             ADD.W   #TNKSPEED,D0       
 
-            ;COMPROBAR COLISIÃ“N DERECHA
+            ;COMPROBAR COLISIÓN DERECHA
             CMP.W   #SCRWIDTH-TNKWIDTH,D0     
             BLE     .DONE
             MOVE.W  #SCRWIDTH-TNKWIDTH,D0     ;RESTA ANCHO DEL TANQUE     
@@ -132,7 +132,7 @@ TNKLEFT
             ;MOVER TANQUE A LA IZQUIERDA 
             SUB.W   #TNKSPEED,D0
 
-            ;COMPROBAR COLISIÃ“N IZQUIERDA
+            ;COMPROBAR COLISIÓN IZQUIERDA
             CMP.W   #0,D0
             BGE     .DONE
             CLR.W   D0       
@@ -147,3 +147,8 @@ TNKLEFT
 
 
 
+
+*~Font name~Courier New~
+*~Font size~14~
+*~Tab type~1~
+*~Tab size~4~

@@ -1,7 +1,10 @@
 ; ==============================================================================
 ; INTRO SCREEN
 ; ==============================================================================
-
+INTINIT			
+*			MOVE.B	#SNDDEM,D7	; MOLESTA DURANTE LAS PREUBAS
+*            TRAP	#SNDPLTN  
+            RTS
 ; ------------------------------------------------------------------------------
 ISCUPD
 ; INTRO SCREEN UPDATE
@@ -91,3 +94,10 @@ ISCPLOT
 
 
 
+
+
+
+*~Font name~Courier New~
+*~Font size~14~
+*~Tab type~1~
+*~Tab size~4~

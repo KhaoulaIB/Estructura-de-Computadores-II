@@ -10,11 +10,9 @@ ALNINIT
 ; ------------------------------------------------------------------------------
             MOVE.W  #ALNIPOSX,(ALNPOSX)
             MOVE.W  #ALNIPOSY,(ALNPOSY)
-            MOVE.W  #ALNSPEED,(ALNVELX)
-            MOVE.W  #ALNSPEED,(ALNVELY)
-*            MOVE.W  #ALNVEL1,(ALNVELV1)
-*            MOVE.W  #ALNVEL2,(ALNVELV2) 
-*            MOVE.W  #ALNVEL3,(ALNVELV3)
+            MOVE.W  #ALNSPD1,(ALNVELX)      ;VELOCIDAD NIVEL 1
+            MOVE.W  #ALNSPD2,(ALNVELX2)     ;VELOCIDAD NIVEL 2
+            MOVE.W  #ALNPIXEL,(ALNVELY)
            	JSR     MAPPLOT
                     
             RTS
@@ -26,14 +24,13 @@ ALNUPD
 ; OUTPUT   : NONE
 ; MODIFIES : NONE
 ; ------------------------------------------------------------------------------
-            ; MOVIMIENTO ALIENS
             MOVEM.L D0-D1,-(A7)
             
             ;GUARDA COORDENADAS
             MOVE.W  (ALNPOSX),D0
             MOVE.W  (ALNPOSY),D1
             
-            ;MIRAR EN QU√â RANGO EST√Å POS(Y)
+            ;MIRAR EN QU… RANGO EST¡ POS(Y)
             ;PARA DETERMINAR EL NIVEL DE DIFICULTAD
             CMP.W   #144,D1
             BLT     .LVL1
@@ -42,45 +39,45 @@ ALNUPD
             BRA     .LVL3   
             
             ;NIVEL 1
-.LVL1      	MOVE.W  #1,(SCOLEVEL)
-            ADD.W   (ALNVELX),D0
+.LVL1      	MOVE.W  #NIVEL1,(SCOLEVEL)
+            ADD.W   (ALNVELX),D0    ;VELOCIDAD EST¡NDAR
             BRA     .CHKCOL
            	
            	;NIVEL 2
-.LVL2      	MOVE.W  #2,(SCOLEVEL)
-            ADD.W   (ALNVELX),D0
-            ADD.W   (ALNVELX),D0
+.LVL2      	MOVE.W  #NIVEL2,(SCOLEVEL)
+            ADD.W   (ALNVELX2),D0   ;1,5 VECES M¡S R¡PIDO
             BRA     .CHKCOL
 
             ;NIVEL 3
-.LVL3      	MOVE.W  #3,(SCOLEVEL)
+.LVL3      	MOVE.W  #NIVEL3,(SCOLEVEL)
             ADD.W   (ALNVELX),D0
-            ADD.W   (ALNVELX),D0
-            ADD.W   (ALNVELX),D0
+            ADD.W   (ALNVELX),D0    ;DOBLE M¡S R¡PIDO        
                 
             ; CHECK HORIZONTAL COLLISIONS
 .CHKCOL     CMP.W   #SCRWIDTH-440,D0
             BGT     .COLRGT
-            CMP.W   #40,D0
+            CMP.W   #ALNDIM,D0
             BLT     .COLLFT
             BRA     .DONE
             
             ; RIGHT SIDE COLLISION
 .COLRGT     ADD.W   (ALNVELY),D1
             NEG.W   (ALNVELX)
+            NEG.W   (ALNVELX2)
             MOVE.W  #SCRWIDTH-440,D0
             BRA     .DONE
             
             ; LEFT SIDE COLLISION
 .COLLFT     ADD.W   (ALNVELY),D1
             NEG.W   (ALNVELX)
-            MOVE.W  #40,D0
-            
+            NEG.W   (ALNVELX2)
+            MOVE.W  #ALNDIM,D0
+      
             ;ESTABLECE COORDENADAS
 .DONE       MOVE.W  D0,(ALNPOSX)
             MOVE.W  D1,(ALNPOSY)
 
-            MOVEM.L (A7)+,D0-D1	 
+            MOVEM.L (A7)+,D0-D1 
             RTS
 
 
@@ -105,12 +102,12 @@ ALNPLOT
             ;CALCULAR COORDENADAS
             MOVE.W  (ALNPOSY),D2
             MOVE.W  D2,D4
-            ADD.W   #ALNDIM,D4          ;POSICI√ìN Y
+            ADD.W   #ALNDIM,D4          ;POSICI”N Y
             MOVE.W  #ALNMPROW-1,D6      ;FILAS MAPA
 
 .CLOOP      MOVE.W  (ALNPOSX),D1
             MOVE.W  D1,D3
-            ADD.W   #ALNDIM,D3          ;POSICI√ìN X
+            ADD.W   #ALNDIM,D3          ;POSICI”N X
             MOVE.W  #ALNMPCOL-1,D5      ;COLUMNAS MAPA
 .RLOOP      TST.B   (A2)+
             BEQ     .NEXT
@@ -146,21 +143,21 @@ ALNPLOT1
             MOVE.B  #87,D0
              
             MOVE.W  D2,D4
-            ADD.W   #4,D4           ;POSICI√ìN Y
+            ADD.W   #ALNDIM/ALNROW,D4           ;POSICI”N Y
             MOVE.W  #ALNROW-1,D6    ;FILAS ALIEN             
 
 .CLOOP1     MOVE.W  D7,D1           ;RESTAURA REGISTRO
             MOVE.W  D1,D3
-            ADD.W   #4,D3           ;POSICI√ìN X    
+            ADD.W   #ALNDIM/ALNROW,D3           ;POSICI”N X    
             MOVE.W  #ALNCOL-1,D5    ;COLUMNAS ALIEN                   
 .RLOOP1     TST.B   (A1)+
             BEQ     .NEXT1
             TRAP    #15
 .NEXT1      MOVE.W  D3,D1
-            ADD.W   #4,D3
+            ADD.W   #ALNDIM/ALNROW,D3
             DBRA.W  D5,.RLOOP1
             MOVE.W  D4,D2
-            ADD.W   #4,D4
+            ADD.W   #ALNDIM/ALNROW,D4
             DBRA.W  D6,.CLOOP1
 
             MOVEM.L (A7)+,D0-D7/A1
@@ -190,10 +187,10 @@ MAPPLOT
 	        
 	        LEA     MAPDATA,A1         
             MOVEQ   #1,D1              
-            MOVEQ   #30-1,D2             
+            MOVEQ   #ALNMPROW*ALNMPCOL-1,D2             
 
 RESET_LOOP
-            MOVE.B  D1,(A1)+           ;ESTABLECER EL VALOR EN LA UBICACI√ìN ACTUAL Y AVANZAR
+            MOVE.B  D1,(A1)+           ;ESTABLECER EL VALOR EN LA UBICACI”N ACTUAL Y AVANZAR
             DBRA    D2,RESET_LOOP      ;DECREMENTAR D2 Y SALTAR SI NO HA ALCANZADO LA LONGITUD TOTAL
 
             MOVEM.W	(A7)+,D1-D2/A1
@@ -255,3 +252,9 @@ RESET_LOOP
 
 
 
+
+
+*~Font name~Courier New~
+*~Font size~14~
+*~Tab type~1~
+*~Tab size~4~

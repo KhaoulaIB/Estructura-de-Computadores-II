@@ -24,7 +24,7 @@ GAMUPD
 ; ------------------------------------------------------------------------------
             MOVEM.L D0-D1/A1-A3,-(A7)
 
-            ;AÃ‘ADIR DISPARO SI TECLADO = "UP" 
+            ;AÑADIR DISPARO SI TECLADO = "UP" 
 		    BTST.B	#2,(KBDEDGE)
 			BEQ		.GOUPD
 			LEA     SHTINIT,A1
@@ -77,3 +77,7 @@ GAMPLOT
 
 
 
+*~Font name~Courier New~
+*~Font size~14~
+*~Tab type~1~
+*~Tab size~4~
