@@ -9,17 +9,17 @@ SYSINIT
             MOVE.L  #SCRPLOT,($80+4*SCRUPTN)
             MOVE.L  #KBDUPD,($80+4*KBDUPTN)
             MOVE.L	#SNDPLAY,($80+4*SNDPLTN)
-            MOVE.L  #SCRTIM,($64)
+            MOVE.L  #SCRTIM,($60+4*SCRINTN)
 	
             JSR SCRINIT
             JSR KBDINIT
             JSR	SNDINIT
 	
+	        ;PASAR A MODO USUARIO Y HABILITAR INTERRUPCIONES
             MOVE.W  SR,-(A7)
             ANDI.W  #$D8FF,(A7)
             
-            RTE
-         
+            RTE      
 
 ; ------------------------------------------------------------------------------
 SNDINIT
@@ -62,12 +62,12 @@ SNDPLAY
             RTE   
 ; ------------------------------------------------------------------------------
 SCRINIT
-; INICIALIZA LA PANTALLA. DEFINE LA RESOLUCIÓN DE PANTALLA. MUESTRA PANTALLA EN
+; INICIALIZA LA PANTALLA. DEFINE LA RESOLUCIÃ“N DE PANTALLA. MUESTRA PANTALLA EN
 ; MODO VENTANA. HABILITA DOBLE BUFFER.
 ; ------------------------------------------------------------------------------
             MOVEM.L D0-D1,-(A7)
 
-            ;DEFINE LA RESOLUCIÓN
+            ;DEFINE LA RESOLUCIÃ“N
             MOVE.B  #33,D0
             MOVE.L  #SCRWIDTH<<16|SCRHEIGH,D1
             TRAP    #15
@@ -76,7 +76,7 @@ SCRINIT
             MOVE.L  #1,D1
             TRAP    #15
             
-            ;VACÍA PANTALLA
+            ;VACÃA PANTALLA
             MOVE.B  #11,D0
             MOVE.W  #$FF00,D1
             TRAP    #15
@@ -86,7 +86,7 @@ SCRINIT
             MOVE.B  #17,D1
             TRAP    #15
             
-            ;HABILITA INTERRUPCIÓN TEMPORIZADA
+            ;HABILITA INTERRUPCIÃ“N TEMPORIZADA
             MOVE.B  #32,D0
             MOVE.B  #6,D1
             MOVE.B  #$81,D2
@@ -109,7 +109,7 @@ SCRPLOT
             MOVE.B  #94,D0
             TRAP    #15
 
-            ;VACÍA BUFFER OCULTO
+            ;VACÃA BUFFER OCULTO
             MOVE.B  #11,D0
             MOVE.W  #$FF00,D1
             TRAP    #15
@@ -196,7 +196,4 @@ KBDUPD
 
 
 
-*~Font name~Courier New~
-*~Font size~14~
-*~Tab type~1~
-*~Tab size~4~
+
