@@ -1,5 +1,5 @@
 ; ==============================================================================
-; PANTALLA DE INTRODUCCIÓN
+; PANTALLA DE INTRODUCCIÃ“N
 ; ==============================================================================
 
 ; ------------------------------------------------------------------------------
@@ -15,78 +15,90 @@ INTINIT
             TRAP    #15			
 
             ;REALIZA SONIDO INTRO
-            MOVE.B	#SNDDEM,D7	
-            TRAP	#SNDPLTN  
+*            MOVE.B	#SNDDEM,D7	
+*            TRAP	#SNDPLTN  
             
             MOVEM.L (A7)+,D0-D2
             RTS
 ; ------------------------------------------------------------------------------
 INTUPD
-; ACTUALIZA PANTALLA DE INTRODUCCIÓN
+; ACTUALIZA PANTALLA DE INTRODUCCIÃ“N
 ; ------------------------------------------------------------------------------
             ;PASA SIGUIENTE ESTADO 
-            BTST.B  #0,(KBDEDGE)    ;SI SE PULSA TECLA HACIA ABAJO
+            BTST.B  #0,(KBDEDGE)        ;SI SE PULSA TECLA HACIA ABAJO
             BEQ     .CONT
-            MOVE.W  #2,(STANEXT)    ;PASA A JUEGO
+            MOVE.W  #STAGAM,(STANEXT)   ;PASA A JUEGO
             BRA     .DONE
-.CONT       BTST.B  #4,(KBDEDGE)    ;SI SE PULSA ESPACIO
+.CONT       BTST.B  #4,(KBDEDGE)        ;SI SE PULSA ESPACIO
             BEQ     .DONE
-            MOVE.W  #1,(STANEXT)    ;VUELVE A INTRO
+            MOVE.W  #STADEM,(STANEXT)   ;VA A DEMO
 .DONE       RTS
+
+
+
+
 
 ; ------------------------------------------------------------------------------
 INTPLOT
-; DIBUJA PANTALLA DE INTRODUCCIÓN. SE INTRODUCE EL JUEGO AL USUARIO MEDIANTE 
+; DIBUJA PANTALLA DE INTRODUCCIÃ“N. SE INTRODUCE EL JUEGO AL USUARIO MEDIANTE 
 ; TEXTO INFORMATIVO.
 ; ------------------------------------------------------------------------------
-            MOVEM.L D0-D1/A0,-(A7)
+            MOVEM.L D0/D2/D3/A0-A1,-(A7)
+    
+			SET_FILL_COLOR	#NEGRO   
+ 			CLR.B   D3              ;CONTADOR
+            LEA     .TXTLIST,A1
+.LOOP       MOVE.L  (A1)+,D2
+            BEQ     .PRINT
 
-            ;ESTABLECE COLOR RELLENO
-            SET_FILL_COLOR	#STAFLCLR
-            
-            ;DIBUJA LAS LINEAS DE TEXTO EN PANTALLA
-            LEA     .TXT1,A0
-            MOVE.B  #5,D0
+            ;MIRAR QUÃ‰ LINEA DE TEXTO ESTAMOS
+            CMP.B   #0,D3
+            BEQ     .TEXTO1
+
+            CMP.B   #1,D3
+            BEQ     .TEXTO2
+
+            CMP.B   #5,D3
+            BEQ     .TEXTO3
+
+            CMP.B   #8,D3
+            BEQ     .TEXTO4
+
+            CMP.B   #9,D3
+            BEQ     .TEXTO5
+            BRA     .NEXT
+
+.TEXTO1     MOVE.B  #5,D0
+            BRA     .NEXT 
+.TEXTO2     MOVE.B  #10,D0
+            BRA     .NEXT
+.TEXTO3     MOVE.B  #16,D0
+            BRA     .NEXT
+.TEXTO4     MOVE.B  #22,D0
+            BRA     .NEXT
+.TEXTO5     MOVE.B  #25,D0
+
+.NEXT       ADDQ.B  #1,D3           ;SUMAR CONTADOR 
+            MOVE.L  D2,A0
+            JSR     UTLPRINT        ;IMPRIME TEXTO
+           	BRA     .LOOP
+ 
+ 
+.PRINT	    BTST.B  #4,(SCRCYCCT)
+			BEQ		.DONE
+            SET_FILL_COLOR	#LILAFRT
+			LEA     .TXT9,A0
+            MOVE.B  #24,D0
             JSR     UTLPRINT
-            
-            LEA     .TXT2,A0
-            MOVE.B  #10,D0
-            JSR     UTLPRINT
-            
-            LEA     .TXT3,A0
-            JSR     UTLPRINT
-            
-            LEA     .TXT4,A0
-            JSR     UTLPRINT
-            
-            LEA     .TXT5,A0
-            JSR     UTLPRINT
-                     
-            LEA     .TXT6,A0
-            MOVE.B  #16,D0
-            JSR     UTLPRINT
-            
-            LEA     .TXT7,A0
-            JSR     UTLPRINT
-            
-            LEA     .TXT8,A0
-            JSR     UTLPRINT     
-            
-            ;LOS SIGUIENTES TEXTOS PARPADEAN
-            BTST.B  #4,(SCRCYCCT)
-            BEQ     .DONE
-            
-            LEA     .TXT9,A0
-            MOVE.B  #22,D0
-            JSR     UTLPRINT
-            
+          
             LEA     .TXT10,A0
-            MOVE.B  #25,D0
+            MOVE.B  #27,D0
             JSR     UTLPRINT
+    		 
+.DONE       MOVEM.L (A7)+,D0/D2/D3/A0-A1
+            RTS   
             
-.DONE       MOVEM.L (A7)+,D0-D1/A0
-            RTS
-            
+
 .TXT1       DC.B    'SPACE INVADERS',0
 .TXT2       DC.B    'INSTRUCTIONS:',0
 .TXT3       DC.B    'PRESS -> TO MOVE TO THE RIGHT',0
@@ -98,6 +110,7 @@ INTPLOT
 .TXT9       DC.B    'PRESS SPACE TO SEE THE DEMO',0
 .TXT10      DC.B    'PRESS KEY DOWN TO START THE GAME',0
             DS.W    0
+.TXTLIST    DC.L    .TXT1,.TXT2,.TXT3,.TXT4,.TXT5,.TXT6,.TXT7,.TXT8,0
 
 
 
@@ -111,10 +124,3 @@ INTPLOT
 
 
 
-
-
-
-*~Font name~Courier New~
-*~Font size~14~
-*~Tab type~1~
-*~Tab size~4~
