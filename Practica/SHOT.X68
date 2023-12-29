@@ -29,19 +29,19 @@ SHTUPD
 	
             ;ACTUALIZA MOVIMIENTO DISPARO
          	MOVE.W  2(A0),D0
-            SUB.W   #SHTSPEED,D0
+            SUB.W   #SHTSPEED,D0        ;RESTAMOS VELOCIDAD (VA HACIA ARRIBA)
            	MOVE.W  D0,2(A0)
            	
            	;ELIMINA DISPARO SI TOCA TECHO
            	ADD.W   #SHTHEIGH,D1
-           	LSR.W   #1,D1
-           	ADD.W   D1,D0
-           	CMP.W   #LIMIT,D0
+           	LSR.W   #1,D1               ;SHTHEIGH/2
+           	ADD.W   D1,D0               
+           	CMP.W   #LIMIT,D0           ;MIRAMOS SI HA LLEGADO A TECHO
            	BGT     .NEXT
            	JSR     AGLKILL
            	
            	;COMPOBAR COLISIONES CON ALIENS
-            ;COMPROBAR COLISI”N DISPARO X IZQUIERDA  
+            ;COMPROBAR COLISI√ìN DISPARO X IZQUIERDA  
 .NEXT       MOVE.W  (ALNPOSX),D0        ;D0 = ALNPOSX 
             MOVE.W  #SHTWIDTH,D2
             LSR.W   #1,D2
@@ -49,7 +49,7 @@ SHTUPD
             CMP.W   D0,D2             
             BLT     .DONE
             
-            ;COMPROBAR COLISI”N DISPARO X DERECHA
+            ;COMPROBAR COLISI√ìN DISPARO X DERECHA
             MOVE.W  #SHTWIDTH,D2
             LSR.W   #1,D2
             SUB.W   (A0),D2            
@@ -59,7 +59,7 @@ SHTUPD
             CMP.W   D3,D2
             BGT     .DONE
             
-            ;COMPROBAR COLISI”N DISPARO Y ARRIBA
+            ;COMPROBAR COLISI√ìN DISPARO Y ARRIBA
             MOVE.W  (ALNPOSY),D1        ;D1 = ALNPOSY
             MOVE.W  #SHTHEIGH,D2
             LSR.W   #1,D2
@@ -67,7 +67,7 @@ SHTUPD
             CMP.W   D1,D2              
             BLT     .DONE
             
-            ;COMPROBAR COLISI”N DISPARO Y ABAJO
+            ;COMPROBAR COLISI√ìN DISPARO Y ABAJO
             MOVE.W  #SHTHEIGH,D2
             LSR.W   #1,D2
             SUB.W   2(A0),D2         
@@ -78,7 +78,7 @@ SHTUPD
             BGE     .DONE
             
 			
-           	;HAY COLISI”N, COMPROBAMOS QU… ALIEN ES
+           	;HAY COLISI√ìN, COMPROBAMOS QU√â ALIEN ES
            	;DETERMINAMOS LA COLUMNA
            	MOVE.W  #SHTWIDTH,D0
            	LSR.W   #1,D0
@@ -102,21 +102,21 @@ SHTUPD
 			MOVE.W  D1,D2
 			CLR.L   D1                  ;EL RESTO DE DIVU NO NOS INTERESA
 			
-			;DETERMINAMOS LA POSICI”N EN LA MATRIZ
-			MULU.W	#10,D2              ;D2 = ÕNDICE FILA * 10
-			ADD.W   D2,D0               ;D0 = D2 + ÕNDICE COLUMNA                
+			;DETERMINAMOS LA POSICI√ìN EN LA MATRIZ
+			MULU.W	#10,D2              ;D2 = √çNDICE FILA * 10
+			ADD.W   D2,D0               ;D0 = D2 + √çNDICE COLUMNA                
 			
-			;MIRAMOS SI EST¡ VIVO EL ALIEN
-			LEA	    MAPDATA,A3
-			CMP.B	#1,(A3,D0.W)          
+			;MIRAMOS SI EST√Å VIVO EL ALIEN
+			LEA	    MAPDATA,A3          ;CARGAMOS EL MAPA 
+			CMP.B	#1,(A3,D0.W)        ;1 = VIVO
 			BNE     .DONE
 			
 			;ALIEN VIVO
 			AND.B   #0,(A3,D0.W)        ;DESAPARECE EL ALIEN
-			ADDQ.W	#1,(SCOPOINT)	    ;INCREMENTAMOS LOS PUNTOS ACUMULADOS           
+			ADDQ.W	#SCOPNT,(SCOPOINT)	;INCREMENTAMOS LOS PUNTOS ACUMULADOS           
             JSR     AGLKILL             ;ELIMINA DISPARO
-			MOVE.B	#SNDSHT,D7         
-			TRAP	#SNDPLTN            ;REPRODUCE SONIDO DE COLISI”N
+            
+            REPRODUCE_SND	#SNDSHT ;REPRODUCE SONIDO DE COLISI√ìN
 			
 .DONE       MOVEM.W  (A7)+,D2-D4
             MOVEM.L  (A7)+,D0-D1
@@ -127,26 +127,25 @@ SHTPLOT
 ; ACTUALIZA EL DISPARO
 ; ENTRADA  : PUNTERO A LAS VARIABLES INSTANCIADAS (A0)
 ; ------------------------------------------------------------------------------
-            MOVEM.L D0-D4,-(A7)
+            MOVEM.W D0-D4,-(A7)
             
-            ;ESTABLECER COLOR CONTORNO
-            SET_PEN_COLOR	#SHTPNCLR            
-            ;ESTABLECER COLOR RELLENO
-            SET_FILL_COLOR	#SHTFLCLR
+            ;ESTABLECER COLOR CONTORNO Y RELLENO
+            SET_PEN_COLOR	#ROJOFRT
+            SET_FILL_COLOR	#ROJOFLJ
           
 		    ;DIBUJAR DISPARO (RECTANGULO)
             MOVE.W  (A0),D1
-            MOVE.W  2(A0),D2
-            SUB.W   #SHTWIDTH/2,D1
+            MOVE.W  2(A0),D2                ;D1,D2 EST√ÅN EN EL CENTRO DEL RECT√ÅNGULO
+            SUB.W   #SHTWIDTH/2,D1          ;RESTAMOS MITAD ANCHO
             MOVE.W  D1,D3
-            ADD.W   #SHTWIDTH,D3
-            ADD.W   #SHTHEIGH/2,D2   
+            ADD.W   #SHTWIDTH,D3            ;SUMAMOS TODO EL ANCHO
+            ADD.W   #SHTHEIGH/2,D2          ;SUMAMOS MITAD ALTURA
             MOVE.W  D2,D4
-            SUB.W   #SHTHEIGH,D4
-            MOVE.B  #87,D0
-            TRAP    #15
+            SUB.W   #SHTHEIGH,D4            ;RESTAMOS TODA LA ALTURA
+            MOVE.B  #87,D0                  
+            TRAP    #15                     ;DIBUJAMOS RECT√ÅNGULO (CUADRADO)
             
-            MOVEM.L (A7)+,D0-D4
+            MOVEM.W (A7)+,D0-D4
             RTS        
 
 
@@ -208,7 +207,7 @@ SHTPLOT
 
 
 
-*~Font name~Courier New~
-*~Font size~14~
-*~Tab type~1~
-*~Tab size~4~
+
+
+
+
