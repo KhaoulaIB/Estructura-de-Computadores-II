@@ -1,5 +1,5 @@
 ; ==============================================================================
-; GESTI�N DE LA DEMO
+; GESTIÓN DE LA DEMO
 ; ==============================================================================
 
 ; ------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ DEMUPD
             ;EN CUALQUIER MOMENTO SE PUEDE PASAR AL SIGUIENTE ESTADO
             BTST.B  #0,(KBDEDGE)        ;SI PULSA KEY DOWN
             BEQ     .CONT
-            MOVE.W  #2,(STANEXT)        ;PASA AL JUEGO
+            MOVE.W  #STAGAM,(STANEXT)   ;PASA AL JUEGO
             BRA     .DONE
 .CONT       BTST.B  #4,(KBDEDGE)        ;SI PULSA EL ESPACIO
             BEQ     .DONE
@@ -34,15 +34,15 @@ DEMUPD
 DEMPLOT
 ; MUESTRA LA DEMO. MUESTRA TEXTO PARA PASAR A SIGUIENTE ESTADO.
 ; ------------------------------------------------------------------------------
-            MOVEM.L D0-D1/A0,-(A7)
+            MOVEM.L D0/A0,-(A7)
             
             JSR 	AGLPLOT
             JSR     TNKPLOT
             JSR     ALNPLOT
        		JSR     SCOPLOT
 
-            ;ESTABLECE COLOR RELLENO
-            SET_FILL_COLOR	#STAFLCLR
+            ;ESTABLECE COLOR TEXTO
+            TEXT_COLOR	#AZUL  
             
             ;IMPRIME LINEAS DE TEXTO PARA PASAR A SIGUIENTE ESTADO
             LEA     .TXT1,A0
@@ -50,9 +50,9 @@ DEMPLOT
             JSR     UTLPRINT
             
             LEA     .TXT2,A0
-            JSR     UTLPRINT           
+            JSR     UTLPRINT        ;UTLPRINT PERMITE PONER TEXTO EN SIGUIENTE LÍNEA (SIN MODIFICAR D0)      
             
-.DONE       MOVEM.L (A7)+,D0-D1/A0
+.DONE       MOVEM.L (A7)+,D0/A0
             RTS
             
 .TXT1       DC.B    'PRESS SPACE TO RETURN TO THE INTRO',0
@@ -75,7 +75,10 @@ DEMPLOT
 
 
 
-*~Font name~Courier New~
-*~Font size~14~
-*~Tab type~1~
-*~Tab size~4~
+
+
+
+
+
+
+
