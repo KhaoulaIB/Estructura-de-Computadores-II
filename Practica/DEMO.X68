@@ -1,75 +1,131 @@
 ; ==============================================================================
-; GESTIÓN DE LA DEMO
+; CLASE FICHERO (SE USA PARA LA DEMO)
 ; ==============================================================================
 
 ; ------------------------------------------------------------------------------
-DEMINIT
-; INICIALIZA LA DEMO
+FILINIT
+; INICIALIZA EL FICHERO (DEMO)
 ; ------------------------------------------------------------------------------
-            JSR     DMMINIT
-            JSR     FILINIT
-            JSR     TNKINIT
-            JSR     ALNINIT  
-            BRA     SCOINIT
-
-; ------------------------------------------------------------------------------
-DEMUPD
-; ACTUALIZA LA DEMO. PERMITE PASAR A OTRO ESTADO.
-; ------------------------------------------------------------------------------
-            JSR     FILUPD
-            JSR     AGLUPD
-            JSR     ALNUPD
+            MOVEM.L D0/A1,-(A7)
             
-            ;EN CUALQUIER MOMENTO SE PUEDE PASAR AL SIGUIENTE ESTADO
-            BTST.B  #0,(KBDEDGE)        ;SI PULSA KEY DOWN
-            BEQ     .CONT
-            MOVE.W  #STAGAM,(STANEXT)   ;PASA AL JUEGO
-            BRA     .DONE
-.CONT       BTST.B  #4,(KBDEDGE)        ;SI PULSA EL ESPACIO
-            BEQ     .DONE
-            CLR.W   (STANEXT)           ;PASA A LA INTRO
-.DONE       RTS
-
-; ------------------------------------------------------------------------------
-DEMPLOT
-; MUESTRA LA DEMO. MUESTRA TEXTO PARA PASAR A SIGUIENTE ESTADO.
-; ------------------------------------------------------------------------------
-            MOVEM.L D0/A0,-(A7)
+            ;ABRIR EL FICHERO
+            MOVE.B  #51,D0
+            LEA     .FILE,A1
+            TRAP    #15  
             
-            JSR 	AGLPLOT
-            JSR     TNKPLOT
-            JSR     ALNPLOT
-       		JSR     SCOPLOT
-
-            ;ESTABLECE COLOR TEXTO
-            TEXT_COLOR	#AZUL  
-            
-            ;IMPRIME LINEAS DE TEXTO PARA PASAR A SIGUIENTE ESTADO
-            LEA     .TXT1,A0
-            MOVE.B  #1,D0
-            JSR     UTLPRINT
-            
-            LEA     .TXT2,A0
-            JSR     UTLPRINT        ;UTLPRINT PERMITE PONER TEXTO EN SIGUIENTE LÍNEA (SIN MODIFICAR D0)      
-            
-.DONE       MOVEM.L (A7)+,D0/A0
+.DONE       MOVEM.L (A7)+,D0/A1
             RTS
+
+.FILE       DC.B    'FIC/fichero.txt',0
+            DS.W    0    
+
+; ------------------------------------------------------------------------------
+FILUPD
+; LEE FICHERO ENTERO Y ACTUALIZA MOVIMIENTOS/DISPARO (DEMO)
+; ------------------------------------------------------------------------------
+            MOVEM.L D2/A1,-(A7)
+            MOVEM.W D0-D1,-(A7)
             
-.TXT1       DC.B    'PRESS SPACE TO RETURN TO THE INTRO',0
-.TXT2       DC.B    'PRESS KEY DOWN TO START THE GAME',0
+            ;PONE FICHERO EN REGISTRO
+            MOVE.B  #53,D0
+            MOVE.L  #1,D2
+            LEA     .BUFFER,A1
+            TRAP    #15
+            
+            ;LEER EL FICHERO BIT A BIT Y PASARLO A NÚMERO REAL
+            SUB.B   #$30,(A1)               ;CONVERTIR ASCII A REAL
+            MOVE.B  (A1),D1
+            TST.B   D1                      ;FICHERO ACABA EN 0
+            BEQ     .DONE
+            ADDQ.L  #1,A1                   ;PASA A SIGUIENTE BIT
+            
+            ;ESPERAR 10 ms ENTRE UNA ACCIÓN Y LA SIGUIENTE
+            WAIT_TIME   #1
+            
+            ;MIRAR QUÉ BIT ES
+            CMP.B   #1,D1
+            BNE     .NEXT1
+            JSR     TNKRIGHT                ;MOVER TANQUE DERECHA SI BIT = 1
+            BRA     .DONE
+         
+.NEXT1      CMP.B   #3,D1
+            BNE     .NEXT2
+            JSR     TNKLEFT                 ;MOVER TANQUE IZQUIERDA SI BIT = 3
+            BRA     .DONE
+            
+.NEXT2      CMP.B   #2,D1
+            BNE     .DONE
+            JSR     SHTADD                  ;AGREGAR DISPARO SI BIT = 2
+            
+.DONE       MOVEM.W (A7)+,D0-D1
+            MOVEM.L (A7)+,D2/A1
+            RTS  
+            
+.BUFFER     DS.B    1       
             DS.W    0
 
-
-
-
-
-
-
+; ------------------------------------------------------------------------------
+SHTADD
+; AGREGA EL DISPARO (DEMO)
+; ------------------------------------------------------------------------------
+            MOVEM.L D0/A1-A3,-(A7)
             
-
-
+            ;SHOT ES UNA CLASE DE TIPO AGENTE
+            LEA     SHTINIT,A1
+            LEA     SHTUPD,A2
+            LEA     SHTPLOT,A3
+            MOVE.W  #1,D0                   ;NO PUEDE SER 0
+            JSR     AGLADD                  ;AÑADIR DISPARO
+            ADD.W   #1,(SCOSHOOT)           ;SUMA A LA PUNTUACIÓN
             
+            MOVEM.L (A7)+,D0/A1-A3
+            RTS
 
+; ------------------------------------------------------------------------------
+TNKRIGHT
+; MUEVE TANQUE A LA DERECHA (DEMO)
+; ------------------------------------------------------------------------------
+            MOVE.W  D0,-(A7)
+            
+            ;GUARDAR VARIABLE EN REGISTRO
+            MOVE.W  (TNKPOSX),D0        
+            
+            ;MOVER TANQUE A LA DERECHA
+            ADD.W   #TNKSPEED,D0       
+
+            ;COMPROBAR COLISIÓN DERECHA
+            CMP.W   #SCRWIDTH-TNKWIDTH,D0     
+            BLE     .DONE
+            MOVE.W  #SCRWIDTH-TNKWIDTH,D0     ;RESTA ANCHO DEL TANQUE     
+            
+            ;ACTUALIZAR VARIABLE
+.DONE       MOVE.W  D0,(TNKPOSX)
+            
+            MOVE.W (A7)+,D0
+            RTS
+            
+; ------------------------------------------------------------------------------
+TNKLEFT
+; MUEVE TANQUE A LA IZQUIERDA (DEMO)
+; ------------------------------------------------------------------------------
+            MOVE.W D0,-(A7)
+            
+            ;GUARDAR VARIABLE EN REGISTRO
+            MOVE.W  (TNKPOSX),D0        
+                     
+            ;MOVER TANQUE A LA IZQUIERDA 
+            SUB.W   #TNKSPEED,D0
+
+            ;COMPROBAR COLISIÓN IZQUIERDA
+            CMP.W   #0,D0
+            BGE     .DONE
+            CLR.W   D0       
+            
+            ;ACTUALIZAR VARIABLE
+.DONE       MOVE.W  D0,(TNKPOSX)
+
+            MOVE.W (A7)+,D0
+            RTS
 
 
 
